@@ -1,0 +1,8 @@
+{
+  "name": "alarmist-rollup",
+  "main": "./src/index.js",
+  "module": "./src/main.js",
+  "dependencies": {
+    "esm": "^3.2.25"
+  }
+}
