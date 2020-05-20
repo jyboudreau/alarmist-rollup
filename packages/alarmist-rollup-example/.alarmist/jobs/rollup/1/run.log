@@ -1,0 +1,7 @@
+[4mrollup v2.10.5[24m
+[36mbundles [1mindex.js[22m → [1mdist/bundle.js[22m...[39m
+STDERR: [1m[33m(!) Circular dependency[39m[22m
+STDERR: helper.js -> other.js -> helper.js
+[32mcreated [1mdist/bundle.js[22m in [1m25ms[22m[39m
+
+[2020-05-20 02:19:20] waiting for changes...

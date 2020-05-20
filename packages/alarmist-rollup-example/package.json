@@ -1,0 +1,20 @@
+{
+  "private": true,
+  "name": "alarmist-rollup-example",
+  "description": "Example of using alarmist-rollup",
+  "author": "Jean-Yves Boudreau <jy@boudreau.id>",
+  "license": "ISC",
+  "scripts": {
+    "example:build": "rollup --config",
+    "example:watch": "rollup --config --watch",
+    "example:alarmist:watch": "yarn node ../alarmist-rollup/src/index.js ./rollup.config.js",
+    "example:monitor": "alarmist-monitor npm-run-all -p example:alarmist:*"
+  },
+  "devDependencies": {
+    "alarmist": "^1.0.27",
+    "alarmist-npm": "^1.0.6",
+    "alarmist-rollup": "workspace:packages/alarmist-rollup",
+    "npm-run-all": "^4.1.5",
+    "rollup": "^2.10.5"
+  }
+}

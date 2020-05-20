@@ -2,3 +2,5 @@
 !.yarn/cache
 !.yarn/releases
 !.yarn/plugins
+
+example/bundle.js
