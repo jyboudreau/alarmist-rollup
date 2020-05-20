@@ -1,6 +1,11 @@
+node_modules
+coverage
+.alarmist
+dist
+
+# Yarn berry 
 .yarn/*
 !.yarn/cache
 !.yarn/releases
 !.yarn/plugins
 
-example/bundle.js

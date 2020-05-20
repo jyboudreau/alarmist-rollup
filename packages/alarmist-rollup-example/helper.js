@@ -1,5 +1,5 @@
-import { getOtherer } from './other.js'
+//import { getOther } from './other.js'
 
 export function getName() {
-  return 'name' + getOtherer()
+  return 'name' //+ getOther()
 }
