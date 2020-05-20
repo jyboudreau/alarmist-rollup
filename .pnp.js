@@ -6385,7 +6385,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ]],
       ["rollup", [
         ["npm:2.10.5", {
-          "packageLocation": "./.yarn/unplugged/rollup-npm-2.10.5-7eb53e39e7/node_modules/rollup/",
+          "packageLocation": "./.yarn/cache/rollup-npm-2.10.5-7eb53e39e7-2.zip/node_modules/rollup/",
           "packageDependencies": [
             ["rollup", "npm:2.10.5"],
             ["fsevents", "patch:fsevents@npm%3A2.1.2#builtin<compat/fsevents>::version=2.1.2&hash=77dfe6"]

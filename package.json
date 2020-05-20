@@ -5,10 +5,5 @@
   "license": "ISC",
   "workspaces": [
     "packages/*"
-  ],
-  "dependenciesMeta": {
-    "rollup": {
-      "unplugged": true
-    }
-  }
+  ]
 }
