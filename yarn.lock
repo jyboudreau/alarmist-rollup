@@ -1881,6 +1881,7 @@ __metadata:
     esm: ^3.2.25
     jest: ^25.3.0
     lodash: ^4.17.15
+    pino: ^6.2.1
     pretty-bytes: ^5.3.0
     pretty-ms: ^7.0.0
     rollup: ^2.10.5
@@ -2209,6 +2210,13 @@ __metadata:
   bin:
     atob: bin/atob.js
   checksum: 3/597c0d1a740bb6522c98bea8fe362ae9420b4203af588d2bd470326d9abd4504264956b8355923d7019a21527ef5e6526a7b4455862ec5178ccd81e0ea289d5f
+  languageName: node
+  linkType: hard
+
+"atomic-sleep@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "atomic-sleep@npm:1.0.0"
+  checksum: 3/2c6fa68cafef5ec1501245da00cde40b8f7ac71428bd727a923ea883b81ad643667a85677056cd663ad3ca584a49dbeb3a1bd4e6c70c1e9e36afd71b6e36ef96
   languageName: node
   linkType: hard
 
@@ -4149,6 +4157,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fast-redact@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "fast-redact@npm:2.0.0"
+  checksum: 3/dc2b3a85cfa5bc23d1d75cac1b19868ecf12e4cc75542244a36c87150681f09ccf6e5198041e928a02a9d6bb6d0514c0675677b4ee876ecf558a39ef07d21e23
+  languageName: node
+  linkType: hard
+
+"fast-safe-stringify@npm:^2.0.7":
+  version: 2.0.7
+  resolution: "fast-safe-stringify@npm:2.0.7"
+  checksum: 3/7bd22543263b707870d70c6f2336b6e8563e34d6807dc388cc0566895e31e0a8273af017a7eb1c9538d0ef54288284e1c0585b557bd856491295a847159fd929
+  languageName: node
+  linkType: hard
+
 "fastq@npm:^1.6.0":
   version: 1.8.0
   resolution: "fastq@npm:1.8.0"
@@ -4284,6 +4306,13 @@ __metadata:
     rimraf: 2.6.3
     write: 1.0.3
   checksum: 3/a36ba407553064be4a571cdee4021a50290f6179a0827df1d076a2e33cd84e543d0274cb15dbeb551c2ae6d53e611e3c02564a93f0d527563d0f560be7a14b0d
+  languageName: node
+  linkType: hard
+
+"flatstr@npm:^1.0.12":
+  version: 1.0.12
+  resolution: "flatstr@npm:1.0.12"
+  checksum: 3/2803767f91887ffd60ac2aac0d6ccf2dd9e2d8f216628a73e3f525d5b5bfa4ac9a5b57334a4c1e6d5622f92f440c52562f7ca9719ace9d025d6c5b7a1a1579db
   languageName: node
   linkType: hard
 
@@ -7708,6 +7737,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"pino-std-serializers@npm:^2.4.2":
+  version: 2.4.2
+  resolution: "pino-std-serializers@npm:2.4.2"
+  checksum: 3/85526a9b35f268bf744e3b9cdb032fb8bcf9aebc6ece2ed04fb0340e7571bea8a48a5f8a7cef1791fffd6bbab7e1f1ff831a072f6c21dd48500d66f50e165f3c
+  languageName: node
+  linkType: hard
+
+"pino@npm:^6.2.1":
+  version: 6.2.1
+  resolution: "pino@npm:6.2.1"
+  dependencies:
+    fast-redact: ^2.0.0
+    fast-safe-stringify: ^2.0.7
+    flatstr: ^1.0.12
+    pino-std-serializers: ^2.4.2
+    quick-format-unescaped: ^4.0.1
+    sonic-boom: ^1.0.0
+  bin:
+    pino: bin.js
+  checksum: 3/87fdc9b43f5d0480c57215e9b6eda61f2fc7a2117c779101b02c5891c427ed35696bf95165993d74f957fb6de1104957e3298fd9c9f4fee4a18c075c6f91701d
+  languageName: node
+  linkType: hard
+
 "pirates@npm:^4.0.1":
   version: 4.0.1
   resolution: "pirates@npm:4.0.1"
@@ -8077,6 +8129,13 @@ __metadata:
   version: 6.5.2
   resolution: "qs@npm:6.5.2"
   checksum: 3/fa0410eff2c05ce3328e11f82db4015e7819c986ee056d6b62b06ae112f4929af09ea3b879ca168ff9f0338f50972bba487ad0e46c879e42bfaf63c3c2ea7f09
+  languageName: node
+  linkType: hard
+
+"quick-format-unescaped@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "quick-format-unescaped@npm:4.0.1"
+  checksum: 3/0935e55e0aaaf789baa080768e822694bc0a497a3170fd35bf2b1aee2a953cf3b5a24e9d29a70dbe7bdc72534c6e1be917ab5c599d587ce0425c98293d8cc1c7
   languageName: node
   linkType: hard
 
@@ -8895,6 +8954,16 @@ resolve@^1.17.0:
     source-map-resolve: ^0.5.0
     use: ^3.1.0
   checksum: 3/c30b63a732bf37dbd2147bf57b4d9eac651ab7b313d1521f73855154b2c2f5a3f2ad18bd47e21cc64b6991f868ecb2a99f8da973ca86da39956f1f0f720b7033
+  languageName: node
+  linkType: hard
+
+"sonic-boom@npm:^1.0.0":
+  version: 1.0.1
+  resolution: "sonic-boom@npm:1.0.1"
+  dependencies:
+    atomic-sleep: ^1.0.0
+    flatstr: ^1.0.12
+  checksum: 3/9b4d7548dd0211ba67c9084c5beb16c7f000606cb9e242eb178fbf8dd148ca566cecd956a4499745f2e9529704d4b260c5dde7be6d91d22402be10b2efd87060
   languageName: node
   linkType: hard
 

@@ -6,7 +6,7 @@ const { watch: watchFile } = require('chokidar')
 const { resolve, relative, isAbsolute } = require('path')
 const { watch: createRollupWatcher } = require('rollup')
 const { VERSION: ROLLUP_VERSION } = require('rollup')
-const loadRollup = require('rollup/dist/loadConfigFile')
+
 const yargs = require('yargs')
 const { createJob } = require('alarmist')
 const color = require('colorette')
