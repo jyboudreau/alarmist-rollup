@@ -5,7 +5,6 @@
   "author": "Jean-Yves Boudreau <jy@boudreau.id>",
   "license": "ISC",
   "main": "./src/index.js",
-  "module": "./src/main.js",
   "dependencies": {
     "callbag-basics": "^3.2.0",
     "callbag-debounce": "^2.1.2",

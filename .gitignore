@@ -5,7 +5,6 @@ dist
 
 # Yarn berry 
 .yarn/*
-!.yarn/cache
 !.yarn/releases
 !.yarn/plugins
-
+.pnp.*

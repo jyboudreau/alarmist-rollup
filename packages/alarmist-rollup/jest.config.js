@@ -5,5 +5,5 @@ module.exports = {
   coverageDirectory: 'coverage',
   rootDir: '.',
   transform: { '^.+\\.js$': require.resolve('./jest-esm-transform.js') },
-  testMatch: ['**/test/**/*.spec.js'],
+  testMatch: ['**/test/**/*.spec.js']
 }

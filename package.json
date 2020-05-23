@@ -3,7 +3,17 @@
   "description": "alarmist-rollup repository",
   "author": "Jean-Yves Boudreau <jy@boudreau.id>",
   "license": "ISC",
+  "scripts": {
+    "format": "modern format '**/*.js'",
+    "lint": "modern lint",
+    "precommit": "modern precommit",
+    "test": "modern test"
+  },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "devDependencies": {
+    "modern-node": "^2.8.0",
+    "standard": "^14.3.4"
+  }
 }
