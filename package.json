@@ -3,7 +3,9 @@
   "description": "alarmist-rollup repository",
   "author": "Jean-Yves Boudreau <jy@boudreau.id>",
   "license": "ISC",
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "format": "prettier-standard --format",
     "lint": "prettier-standard --lint",
