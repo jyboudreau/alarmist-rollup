@@ -3,17 +3,25 @@
   "description": "alarmist-rollup repository",
   "author": "Jean-Yves Boudreau <jy@boudreau.id>",
   "license": "ISC",
+  "workspaces": ["packages/*"],
   "scripts": {
-    "format": "modern format '**/*.js'",
-    "lint": "modern lint",
-    "precommit": "modern precommit",
-    "test": "modern test"
+    "format": "prettier-standard --format",
+    "lint": "prettier-standard --lint",
+    "test": "jest"
   },
-  "workspaces": [
-    "packages/*"
-  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*": "prettier-standard --lint"
+  },
   "devDependencies": {
-    "modern-node": "^2.8.0",
-    "standard": "^14.3.4"
+    "husky": "^4.2.5",
+    "jest": "^26.0.1",
+    "jest-mock-console": "^1.0.0",
+    "lint-staged": "^10.2.6",
+    "prettier-standard": "^16.3.0"
   }
 }

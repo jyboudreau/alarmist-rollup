@@ -1,6 +1,10 @@
 const defaultDestination = {
-  log: console.log.bind(console),
-  error: console.error.bind(console)
+  log (...params) {
+    return console.log(...params)
+  },
+  error (...params) {
+    return console.error(...params)
+  }
 }
 
 let destination = defaultDestination
