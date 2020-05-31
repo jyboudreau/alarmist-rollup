@@ -4,6 +4,7 @@ const { create: createJobRunner } = require('./job-runner.js')
 const rollupStream = require('./rollup-stream.js')
 const { createRollupPrinter } = require('./rollup-format.js')
 
+// TODO: Test this function
 function watch ({ name, configFile, workingDir, colors, debounceWait } = { debounceWait: 1000 }) {
   const jobRunner = createJobRunner(name, workingDir)
   const printRollupEvent = createRollupPrinter(jobRunner.write, { colors })
