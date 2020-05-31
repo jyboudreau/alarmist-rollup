@@ -5,6 +5,9 @@
   "author": "Jean-Yves Boudreau <jy@boudreau.id>",
   "license": "ISC",
   "main": "./src/index.js",
+  "scripts": {
+    "test": "jest"
+  },
   "dependencies": {
     "callbag-basics": "^3.2.0",
     "callbag-debounce": "^2.1.2",
@@ -13,6 +16,7 @@
     "chokidar": "^3.3.1",
     "colorette": "^1.2.0",
     "date-time": "^3.1.0",
+    "p-queue": "^6.4.0",
     "pretty-bytes": "^5.3.0",
     "pretty-ms": "^7.0.0",
     "yargs": "^15.3.1"
@@ -22,7 +26,9 @@
     "@babel/preset-env": "^7.9.5",
     "alarmist": "^1.0.27",
     "babel-jest": "^25.3.0",
-    "jest": "^25.3.0",
+    "callbag-mock": "^2.3.0",
+    "flush-promises": "^1.0.2",
+    "jest": "^26.0.1",
     "rollup": "^2.10.5"
   },
   "peerDependencies": {

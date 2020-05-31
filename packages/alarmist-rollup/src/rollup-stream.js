@@ -1,22 +1,12 @@
-const { flatten, fromPromise, map, merge, pipe, scan, share } = require('callbag-basics')
+const { combine, flatten, fromPromise, map, merge, pipe, scan, share } = require('callbag-basics')
 const { debounce } = require('callbag-debounce')
 const fromNodeEvent = require('callbag-from-events')
+const { default: callbagOf } = require('callbag-of')
 const { watch: watchFile } = require('chokidar')
 const { watch: createRollupWatcher } = require('rollup')
 const loadRollup = require('rollup/dist/loadConfigFile')
-const { resolve } = require('path')
-const logger = require('./logger')
 
-async function loadRollupConfig (configFile) {
-  try {
-    return loadRollup(resolve(configFile))
-  } catch (error) {
-    logger.error('Failed to load rollup configuration, error:', error)
-    throw error
-  }
-}
-
-function createRollupWatchStream ({ configFile, debounceWait = 1000 }) {
+function createRollupConfigStream ({ configFile, debounceWait = 0 }) {
   const fileWatcher = watchFile(configFile)
 
   const fileReadyStream = fromNodeEvent(fileWatcher, 'ready')
@@ -27,12 +17,15 @@ function createRollupWatchStream ({ configFile, debounceWait = 1000 }) {
     debounceWait ? debounce(debounceWait)(fileChangeStream) : fileChangeStream
   )
 
-  const configStream = pipe(
+  return pipe(
     fileUpdateStream,
-    map(() => fromPromise(loadRollupConfig(configFile))),
-    flatten
+    map(() => fromPromise(loadRollup(configFile))),
+    flatten,
+    share
   )
+}
 
+function createRollupEventStream (configStream) {
   return pipe(
     configStream,
     scan((rollupWatcher, { options, warnings }) => {
@@ -47,8 +40,14 @@ function createRollupWatchStream ({ configFile, debounceWait = 1000 }) {
 
       return watcher
     }, undefined),
-    share
+    map(watcher => combine(fromNodeEvent(watcher, 'event'), callbagOf(watcher))),
+    flatten,
+    // Combine add the source to the event.
+    map(([event, source]) => ({ ...event, source }))
   )
 }
 
-module.exports = { createRollupWatchStream }
+module.exports = {
+  createRollupConfigStream,
+  createRollupEventStream
+}

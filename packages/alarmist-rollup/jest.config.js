@@ -3,6 +3,6 @@ module.exports = {
   collectCoverage: true,
   collectCoverageFrom: ['src/**/*.js', '!**/node_modules/**'],
   coverageDirectory: 'coverage',
-  rootDir: '.',
-  testMatch: ['**/test/**/*.spec.js']
+  setupFilesAfterEnv: ['jest-mock-console/dist/setupTestFramework.js'],
+  testMatch: ['**/test/**/*.test.js']
 }

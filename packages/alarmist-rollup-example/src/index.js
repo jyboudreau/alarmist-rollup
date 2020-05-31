@@ -1,5 +1,5 @@
 import { getName } from './helper.js'
 
-export const name = getName() + 'yoyo'
+export const name = getName()
 
 console.log(name)

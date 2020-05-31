@@ -7,8 +7,8 @@
   "scripts": {
     "example:build": "rollup --config",
     "example:watch": "rollup --config --watch",
-    "example:alarmist:watch": "yarn node ../alarmist-rollup/src/index.js ./rollup.config.js",
-    "example:monitor": "alarmist-monitor npm-run-all -p example:alarmist:*"
+    "example:alarmist:watch": "yarn node ../alarmist-rollup/src/cli.js ./rollup.config.js",
+    "example:monitor": "alarmist-monitor npm-run-all -p \"example:alarmist:*\""
   },
   "devDependencies": {
     "alarmist": "^1.0.27",
