@@ -25,7 +25,7 @@ function createRollupPrinter (output, { colors, silent } = { colors: true, silen
     output(util.format(...params, '\n'))
   }
 
-  // #region Rollup Simulacrum
+  // #region Rollup CLI Simulacrum
 
   function relativeId (id) {
     if (!isAbsolute(id)) {
