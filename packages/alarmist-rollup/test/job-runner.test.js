@@ -26,8 +26,7 @@ test('createJobRunner creates a job runner', () => {
     expect.objectContaining({
       end: expect.any(Function),
       start: expect.any(Function),
-      write: expect.any(Function),
-      writeln: expect.any(Function)
+      write: expect.any(Function)
     })
   )
 })
@@ -171,18 +170,4 @@ test('jobRunner.write will write to console if there is no job running', async (
   await jobRunner.write(message)
 
   expect(console.error).toBeCalledWith(expect.stringContaining(message))
-})
-
-test('jobRunner.writeln will write to a job with a line ending', async () => {
-  const mockJob = createMockJob()
-
-  alarmist.createJob.mockResolvedValue(mockJob)
-
-  const jobRunner = createJobRunner()
-
-  await jobRunner.start()
-  const message = 'hello'
-  await jobRunner.writeln(message)
-
-  expect(mockJob.log.write).toBeCalledWith(`${message}\n`)
 })

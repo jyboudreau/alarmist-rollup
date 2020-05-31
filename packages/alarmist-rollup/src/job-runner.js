@@ -1,6 +1,10 @@
 const { createJob } = require('alarmist')
 const { default: PQueue } = require('p-queue')
 
+/**
+ * Creates an alarmist job runner that provides a synchronous interface to creating
+ * jobs, logging to them and ending them.
+ */
 const create = ({ name = 'rollup', workingDir = './.alarmist', abortMessage = 'aborted: new run started' } = {}) => {
   let jobOrPromise
   const queue = new PQueue({ concurrency: 1 })
@@ -45,15 +49,10 @@ const create = ({ name = 'rollup', workingDir = './.alarmist', abortMessage = 'a
     })
   }
 
-  const writeln = async data => {
-    await write(`${data}\n`)
-  }
-
   return {
     end,
     start,
-    write,
-    writeln
+    write
   }
 }
 
