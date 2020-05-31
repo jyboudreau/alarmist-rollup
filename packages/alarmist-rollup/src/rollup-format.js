@@ -16,8 +16,6 @@ const util = require('util')
 
 const { withRedirectedOutput } = require('./utils.js')
 
-// Rollup code uses a function named stderr that writes to stderr via console.error.
-// We use the same name to keep the code similar to the rollup cli code.
 function createRollupPrinter (output, { colors, silent } = { colors: true, silent: false }) {
   color.options.enabled = colors
 
@@ -108,9 +106,9 @@ function createRollupPrinter (output, { colors, silent } = { colors: true, silen
     }
   }
 
-  // #endregion
+  // #endregion Rollup Simulacrum
 
-  // Because warnings are indiscriminately written to console.error we need to redirect the output
+  // Because warnings are indiscriminately written to console.error by rollup we need to redirect the output
   // in order to target our output function.
   return event => withRedirectedOutput(() => printEvent(event, event.source.warnings), output, 'stderr')
 }
