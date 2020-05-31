@@ -21,9 +21,12 @@ function watch ({ name, configFile, workingDir, colors, debounceWait } = { debou
           printRollupEvent(event)
           break
         case 'END':
-        case 'ERROR':
           printRollupEvent(event)
           jobRunner.end()
+          break
+        case 'ERROR':
+          printRollupEvent(event)
+          jobRunner.end('rollup build failed')
           break
         default:
           printRollupEvent(event)
