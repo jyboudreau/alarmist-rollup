@@ -1,4 +1,4 @@
-const { combine, flatten, fromPromise, map, merge, pipe, scan, share } = require('callbag-basics')
+const { combine, flatten, fromPromise, map, merge, pipe, scan } = require('callbag-basics')
 const { debounce } = require('callbag-debounce')
 const fromNodeEvent = require('callbag-from-events')
 const { default: callbagOf } = require('callbag-of')
@@ -20,8 +20,7 @@ function createRollupConfigStream ({ configFile, debounceWait = 0 }) {
   return pipe(
     fileUpdateStream,
     map(() => fromPromise(loadRollup(configFile))),
-    flatten,
-    share
+    flatten
   )
 }
 
