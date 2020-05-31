@@ -4,12 +4,11 @@ const { create: createJobRunner } = require('./job-runner.js')
 const rollupStream = require('./rollup-stream.js')
 const { createRollupPrinter } = require('./rollup-format.js')
 
-function watch ({ name, configFile, workingDir, colors } = {}) {
+function watch ({ name, configFile, workingDir, colors, debounceWait } = { debounceWait: 1000 }) {
   const jobRunner = createJobRunner(name, workingDir)
   const printRollupEvent = createRollupPrinter(jobRunner.write, { colors })
 
-  // TODO: Make debounce wait a parameter.
-  const configStream = rollupStream.createRollupConfigStream({ configFile, debounceWait: 1000 })
+  const configStream = rollupStream.createRollupConfigStream({ configFile, debounceWait })
   const rollupEventStream = rollupStream.createRollupEventStream(configStream)
 
   pipe(
