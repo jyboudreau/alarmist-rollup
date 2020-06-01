@@ -4,6 +4,7 @@
   "description": "Wrap rollup in an alarmist job",
   "author": "Jean-Yves Boudreau <jy@boudreau.id>",
   "license": "ISC",
+  "bin": "./bin/index.js",
   "main": "./src/index.js",
   "scripts": {
     "test": "jest"

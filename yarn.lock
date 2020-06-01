@@ -985,6 +985,8 @@ __metadata:
   peerDependencies:
     alarmist: "*"
     rollup: "*"
+  bin:
+    alarmist-rollup: ./bin/index.js
   languageName: unknown
   linkType: soft
 
