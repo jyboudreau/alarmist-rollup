@@ -32,14 +32,30 @@ function createRollupEventStream (configStream) {
       if (rollupWatcher) {
         rollupWatcher.close()
       }
-      const watcher = createRollupWatcher(options)
 
-      // Attach the warnings to the watcher... such a weird interface.
-      watcher.warnings = warnings
+      console.log('Options: ', JSON.stringify(options))
 
-      return watcher
+      let result = {}
+
+      try {
+        result = createRollupWatcher(options)
+      } catch (error) {
+        result = error
+      }
+
+      // Attach the warnings to the result... such a weird interface.
+      result.warnings = warnings
+
+      return result
     }, undefined),
-    map(watcher => combine(fromNodeEvent(watcher, 'event'), callbagOf(watcher))),
+    map(result =>
+      combine(
+        result instanceof Error
+          ? callbagOf({ code: 'ERROR', error: result }) // Simulate an error event
+          : fromNodeEvent(result, 'event'),
+        callbagOf(result)
+      )
+    ),
     flatten,
     // Combine add the source to the event.
     map(([event, source]) => ({ ...event, source }))
