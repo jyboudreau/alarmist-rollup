@@ -6,7 +6,7 @@ const { default: PQueue } = require('p-queue')
  * jobs, writting to them and ending them. This provides an easy way to do queue these operations
  * synchronously.
  */
-const create = ({ name = 'rollup', workingDir = './.alarmist', abortMessage = 'aborted: new run started' } = {}) => {
+const create = ({ name, workingDir, abortMessage = 'aborted: new run started' } = {}) => {
   let jobOrPromise
   const queue = new PQueue({ concurrency: 1 })
 

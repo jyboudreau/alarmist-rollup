@@ -16,9 +16,7 @@ const util = require('util')
 
 const { withRedirectedOutput } = require('./utils.js')
 
-function createRollupPrinter (output, { colors, silent } = { colors: true, silent: false }) {
-  color.options.enabled = colors
-
+function createRollupPrinter (output, { silent } = { silent: false }) {
   // Rollup code uses a function named stderr that writes to stderr via console.error.
   // We use the same name to keep the code similar to the rollup cli code.
   const stderr = (...params) => {

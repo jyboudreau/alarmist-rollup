@@ -1,13 +1,17 @@
 const { forEach, pipe } = require('callbag-basics')
-
+const path = require('path')
 const { create: createJobRunner } = require('./job-runner.js')
 const rollupStream = require('./rollup-stream.js')
 const { createRollupPrinter } = require('./rollup-format.js')
+const { getDefaults } = require('./defaults')
 
 // TODO: Test this function
-function watch ({ name, configFile, workingDir, colors, debounceWait } = { debounceWait: 1000 }) {
-  const jobRunner = createJobRunner(name, workingDir)
-  const printRollupEvent = createRollupPrinter(jobRunner.write, { colors })
+function watch (params = {}) {
+  let { name, configFile, workingDir, debounceWait } = { ...getDefaults(), ...params }
+
+  configFile = path.resolve(params.configFile)
+  const jobRunner = createJobRunner({ name, workingDir })
+  const printRollupEvent = createRollupPrinter(jobRunner.write)
 
   const configStream = rollupStream.createRollupConfigStream({ configFile, debounceWait })
   const rollupEventStream = rollupStream.createRollupEventStream(configStream)
