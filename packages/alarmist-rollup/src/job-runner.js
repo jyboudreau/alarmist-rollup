@@ -28,10 +28,7 @@ const create = ({ name, workingDir, abortMessage = 'aborted: new run started' } 
 
   const start = async () => {
     return withJob(job => {
-      if (job) {
-        job.end(abortMessage)
-      }
-      return createJob({ name, workingDir })
+      return job || createJob({ name, workingDir })
     })
   }
 

@@ -5,14 +5,16 @@ const rollupStream = require('./rollup-stream.js')
 const { createRollupPrinter } = require('./rollup-format.js')
 const { getDefaults } = require('./defaults')
 
-// TODO: Test this function
 function watch (params = {}) {
   let { name, configFile, workingDir, debounceWait } = { ...getDefaults(), ...params }
 
   configFile = path.resolve(params.configFile)
   const jobRunner = createJobRunner({ name, workingDir })
-  const printRollupEvent = createRollupPrinter(jobRunner.write)
 
+  // Start a job in order to capture any ouput.
+  jobRunner.start()
+
+  const printRollupEvent = createRollupPrinter(jobRunner.write)
   const configStream = rollupStream.createRollupConfigStream({ configFile, debounceWait })
   const rollupEventStream = rollupStream.createRollupEventStream(configStream)
 

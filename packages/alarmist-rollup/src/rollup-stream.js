@@ -2,9 +2,20 @@ const { combine, flatten, fromPromise, map, merge, pipe, scan } = require('callb
 const { debounce } = require('callbag-debounce')
 const fromNodeEvent = require('callbag-from-events')
 const { default: callbagOf } = require('callbag-of')
+const tap = require('callbag-tap')
 const { watch: watchFile } = require('chokidar')
 const { watch: createRollupWatcher } = require('rollup')
 const loadRollup = require('rollup/dist/loadConfigFile')
+
+async function eitherLoadRollup (...params) {
+  try {
+    console.log('Trying to load rollup')
+    return await loadRollup(...params)
+  } catch (err) {
+    console.log(err)
+    throw err
+  }
+}
 
 function createRollupConfigStream ({ configFile, debounceWait = 0 }) {
   const fileWatcher = watchFile(configFile)
@@ -19,12 +30,16 @@ function createRollupConfigStream ({ configFile, debounceWait = 0 }) {
 
   return pipe(
     fileUpdateStream,
-    map(() => fromPromise(loadRollup(configFile))),
+    tap(event => console.log('beforePromise: ', event)),
+    map(() => fromPromise(eitherLoadRollup(configFile))),
+    tap(event => console.log('afterPromise: ', event)),
     flatten
   )
 }
 
 function createRollupEventStream (configStream) {
+  // TODO: Need to combine errors that can happen throughout the pipeline. Errors in configStream are not handled.
+
   return pipe(
     configStream,
     scan((rollupWatcher, { options, warnings }) => {
@@ -33,10 +48,7 @@ function createRollupEventStream (configStream) {
         rollupWatcher.close()
       }
 
-      console.log('Options: ', JSON.stringify(options))
-
       let result = {}
-
       try {
         result = createRollupWatcher(options)
       } catch (error) {
