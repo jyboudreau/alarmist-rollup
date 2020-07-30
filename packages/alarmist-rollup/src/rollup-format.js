@@ -108,7 +108,18 @@ function createRollupPrinter (output, { silent } = { silent: false }) {
 
   // Because warnings are indiscriminately written to console.error by rollup we need to redirect the output
   // in order to target our output function.
-  return event => withRedirectedOutput(() => printEvent(event, event.source.warnings), output, 'stderr')
+  return event => {
+    withRedirectedOutput(
+      () => {
+        // If we don't have a source or warnings on that source, just provide a dummy warning object.
+        const warnings = (event && event.source && event.source.warnings) || { flush: () => {} }
+        printEvent(event, warnings)
+      },
+      {
+        stderr: output
+      }
+    )
+  }
 }
 
 module.exports = { createRollupPrinter }

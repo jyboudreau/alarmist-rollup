@@ -7,7 +7,7 @@ test('getDefaults returns default object', () => {
   expect(getDefaults()).toMatchInlineSnapshot(`
     Object {
       "configFile": "rollup.config.js",
-      "debounceWait": 1000,
+      "debounceWait": 0,
       "name": "rollup",
       "workingDir": ".alarmist",
     }

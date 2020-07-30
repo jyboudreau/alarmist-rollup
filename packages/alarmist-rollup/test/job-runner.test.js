@@ -42,7 +42,7 @@ test('jobRunner start will start an alarmist job', async () => {
   expect(alarmist.createJob).toBeCalledTimes(1)
 })
 
-test('jobRunner start will end a current job if we start a new one.', async () => {
+test('jobRunner start with forceAbort will end a current job if we start a new one.', async () => {
   const jobRunner = createJobRunner()
 
   const mockJob1 = createMockJob()
@@ -57,7 +57,7 @@ test('jobRunner start will end a current job if we start a new one.', async () =
 
   expect(alarmist.createJob).toBeCalledTimes(1)
 
-  await jobRunner.start()
+  await jobRunner.start(true)
 
   expect(mockJob1.end).nthCalledWith(1, 'aborted: new run started')
 })
@@ -93,7 +93,7 @@ describe('jobRunner parameter', () => {
     const jobRunner = createJobRunner({ abortMessage })
 
     await jobRunner.start()
-    await jobRunner.start()
+    await jobRunner.start(true)
 
     expect(mockJob1.end).lastCalledWith(abortMessage)
   })

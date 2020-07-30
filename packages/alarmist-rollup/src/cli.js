@@ -43,9 +43,7 @@ function run (args) {
     .exitProcess(false)
 
   const argv = cli.parse(args)
-  if (argv.help) {
-    yargs.showHelp()
-  } else {
+  if (!argv.help) {
     watch({
       name: argv.name,
       workingDir: argv['working-dir'],

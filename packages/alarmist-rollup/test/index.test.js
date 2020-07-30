@@ -14,7 +14,6 @@ jest.mock('../src/rollup-format.js')
 
 path.resolve = jest.fn()
 jobRunner.create = jest.fn()
-rollupStream.createRollupConfigStream = jest.fn()
 rollupStream.createRollupEventStream = jest.fn()
 rollupFormat.createRollupPrinter = jest.fn()
 
@@ -72,7 +71,7 @@ test('alarmist-rollup creates config stream with the right file', () => {
   jobRunner.create.mockReturnValue(createMockJobRunner())
 
   watch({ configFile })
-  expect(rollupStream.createRollupConfigStream).toBeCalledWith(expect.objectContaining({ configFile }))
+  expect(rollupStream.createRollupEventStream).toBeCalledWith(expect.objectContaining({ configFile }))
 })
 
 test('alarmist-rollup creates config stream with the debounce wait', () => {
@@ -82,7 +81,23 @@ test('alarmist-rollup creates config stream with the debounce wait', () => {
   jobRunner.create.mockReturnValue(createMockJobRunner())
 
   watch({ debounceWait })
-  expect(rollupStream.createRollupConfigStream).toBeCalledWith(expect.objectContaining({ debounceWait }))
+  expect(rollupStream.createRollupEventStream).toBeCalledWith(expect.objectContaining({ debounceWait }))
+})
+
+test('alarmist-rollup does the right thing on INIT event', () => {
+  const mockEventStream = callbagMock(true)
+  const mockJobRunner = createMockJobRunner()
+
+  // The mock printer just returns the output function passed to it.
+  rollupFormat.createRollupPrinter.mockImplementation(val => val)
+  rollupStream.createRollupEventStream.mockReturnValue(mockEventStream)
+  jobRunner.create.mockReturnValue(mockJobRunner)
+
+  watch()
+  const event = { code: 'INIT' }
+  mockEventStream.emit(1, event)
+
+  expect(mockJobRunner.getCalls()).toEqual([['start', true]])
 })
 
 test('alarmist-rollup does the right thing on START event', () => {

@@ -3,7 +3,7 @@ const path = require('path')
 const { create: createJobRunner } = require('./job-runner.js')
 const rollupStream = require('./rollup-stream.js')
 const { createRollupPrinter } = require('./rollup-format.js')
-const { getDefaults } = require('./defaults')
+const { getDefaults } = require('./defaults.js')
 
 function watch (params = {}) {
   let { name, configFile, workingDir, debounceWait } = { ...getDefaults(), ...params }
@@ -11,17 +11,18 @@ function watch (params = {}) {
   configFile = path.resolve(params.configFile)
   const jobRunner = createJobRunner({ name, workingDir })
 
-  // Start a job in order to capture any ouput.
-  jobRunner.start()
-
   const printRollupEvent = createRollupPrinter(jobRunner.write)
-  const configStream = rollupStream.createRollupConfigStream({ configFile, debounceWait })
-  const rollupEventStream = rollupStream.createRollupEventStream(configStream)
+  const rollupEventStream = rollupStream.createRollupEventStream({ configFile, debounceWait })
 
   pipe(
     rollupEventStream,
     forEach(event => {
       switch (event.code) {
+        case 'INIT':
+          // INIT is not a standard rollup event and is just a notification that
+          // a new config file is loading and should trigger a hard reset of the job.
+          jobRunner.start(true)
+          break
         case 'START':
           jobRunner.start()
           printRollupEvent(event)

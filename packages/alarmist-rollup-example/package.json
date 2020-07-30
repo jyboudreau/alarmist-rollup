@@ -7,7 +7,7 @@
   "scripts": {
     "example:build": "rollup --config",
     "example:watch": "rollup --config --watch",
-    "example:alarmist:watch": "alarmist-rollup",
+    "example:alarmist:watch": "alarmist-rollup -n example-rollup",
     "example:monitor": "alarmist-monitor npm-run-all -p \"example:alarmist:*\""
   },
   "devDependencies": {

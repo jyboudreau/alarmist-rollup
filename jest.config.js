@@ -10,5 +10,5 @@ module.exports = {
       statements: 100
     }
   },
-  projects: ['<rootDir>/packages/*']
+  projects: ['<rootDir>/packages/alarmist-rollup']
 }

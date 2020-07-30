@@ -1,80 +1,76 @@
-const { combine, flatten, fromPromise, map, merge, pipe, scan } = require('callbag-basics')
-const { debounce } = require('callbag-debounce')
+const { flatten, filter, fromPromise, map, merge, pipe, scan, share } = require('callbag-basics')
 const fromNodeEvent = require('callbag-from-events')
-const { default: callbagOf } = require('callbag-of')
-const tap = require('callbag-tap')
-const { watch: watchFile } = require('chokidar')
 const { watch: createRollupWatcher } = require('rollup')
 const loadRollup = require('rollup/dist/loadConfigFile')
 
-async function eitherLoadRollup (...params) {
-  try {
-    console.log('Trying to load rollup')
-    return await loadRollup(...params)
-  } catch (err) {
-    console.log(err)
-    throw err
-  }
+const { create: createFileWatcherStream } = require('./file-watcher-stream.js')
+const { safeAsync, safeSync } = require('./utils.js')
+
+const safeLoadRollup = safeAsync(loadRollup)
+const safeCreateRollupWatcher = safeSync(createRollupWatcher)
+
+function createEventFromError (error, source = undefined) {
+  return { code: 'ERROR', error, source }
 }
 
-function createRollupConfigStream ({ configFile, debounceWait = 0 }) {
-  const fileWatcher = watchFile(configFile)
+function createRollupEventStream ({ configFile, debounceWait = 0 }) {
+  const fileUpdateStream = share(createFileWatcherStream(configFile, debounceWait))
 
-  const fileReadyStream = fromNodeEvent(fileWatcher, 'ready')
-  const fileChangeStream = fromNodeEvent(fileWatcher, 'change')
-
-  const fileUpdateStream = merge(
-    fileReadyStream,
-    debounceWait ? debounce(debounceWait)(fileChangeStream) : fileChangeStream
+  const initEvents = pipe(
+    fileUpdateStream,
+    map(() => ({ code: 'INIT' }))
   )
 
-  return pipe(
+  const configStream = pipe(
     fileUpdateStream,
-    tap(event => console.log('beforePromise: ', event)),
-    map(() => fromPromise(eitherLoadRollup(configFile))),
-    tap(event => console.log('afterPromise: ', event)),
+    map(() => fromPromise(safeLoadRollup(configFile))),
+    flatten,
+    share
+  )
+
+  const configErrors = pipe(
+    configStream,
+    filter(result => Boolean(result.error)),
+    map(result => createEventFromError(result.error))
+  )
+  const watchers = pipe(
+    configStream,
+    filter(result => Boolean(result.ok)),
+    scan((watcherResult, { ok: { options, warnings } }) => {
+      // If there was already a rollup watcher, close it.
+      if (watcherResult && watcherResult.ok) {
+        watcherResult.ok.close()
+      }
+      const result = safeCreateRollupWatcher(options)
+      result.warnings = warnings
+      return result
+    }, {}),
+    share
+  )
+
+  const watcherEvents = pipe(
+    watchers,
+    filter(result => Boolean(result.ok)),
+    map(({ ok: watcher, warnings }) => {
+      // Attach the warnings to the source.
+      watcher.warnings = warnings
+      return pipe(
+        fromNodeEvent(watcher, 'event'),
+        map(event => ({ ...event, source: watcher }))
+      )
+    }),
     flatten
   )
-}
 
-function createRollupEventStream (configStream) {
-  // TODO: Need to combine errors that can happen throughout the pipeline. Errors in configStream are not handled.
-
-  return pipe(
-    configStream,
-    scan((rollupWatcher, { options, warnings }) => {
-      // If there was already a rollup watcher, close it.
-      if (rollupWatcher) {
-        rollupWatcher.close()
-      }
-
-      let result = {}
-      try {
-        result = createRollupWatcher(options)
-      } catch (error) {
-        result = error
-      }
-
-      // Attach the warnings to the result... such a weird interface.
-      result.warnings = warnings
-
-      return result
-    }, undefined),
-    map(result =>
-      combine(
-        result instanceof Error
-          ? callbagOf({ code: 'ERROR', error: result }) // Simulate an error event
-          : fromNodeEvent(result, 'event'),
-        callbagOf(result)
-      )
-    ),
-    flatten,
-    // Combine add the source to the event.
-    map(([event, source]) => ({ ...event, source }))
+  const watcherErrors = pipe(
+    watchers,
+    filter(result => Boolean(result.error)),
+    map(({ error, warnings }) => createEventFromError(error, { warnings }))
   )
+
+  return merge(initEvents, configErrors, watcherEvents, watcherErrors)
 }
 
 module.exports = {
-  createRollupConfigStream,
   createRollupEventStream
 }

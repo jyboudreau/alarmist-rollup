@@ -1,170 +1,181 @@
 /* global jest */ // See https://github.com/facebook/jest/issues/9920 */
-const { beforeEach, expect, test } = require('@jest/globals')
+const { beforeEach, describe, expect, test } = require('@jest/globals')
 const callbagMock = require('callbag-mock')
-const chokidar = require('chokidar')
 const rollup = require('rollup')
 const loadRollup = require('rollup/dist/loadConfigFile')
-const { default: mockConsole } = require('jest-mock-console')
 const EventEmitter = require('events')
 const flushPromises = require('flush-promises')
+const fileWatcherStream = require('../src/file-watcher-stream.js')
 
-jest.mock('chokidar')
 jest.mock('rollup')
 jest.mock('rollup/dist/loadConfigFile')
-jest.useFakeTimers()
+jest.mock('../src/file-watcher-stream.js')
 
-chokidar.watch = jest.fn()
 rollup.watch = jest.fn()
+fileWatcherStream.create = jest.fn()
 
-const { createRollupConfigStream, createRollupEventStream } = require('../src/rollup-stream.js')
+const { createRollupEventStream } = require('../src/rollup-stream.js')
 
 beforeEach(() => {
   // Disable console from polluting tests
-  mockConsole()
-  chokidar.watch.mockReset()
-  rollup.watch.mockReset()
   loadRollup.mockReset()
-})
-
-test('createRollupConfigStream returns a stream of configs that emits when the file is ready', async () => {
-  const mockChokidarWatcher = new EventEmitter()
-  const config = { options: 'dummyOptions' }
-  const configFile = 'dummyFile'
-
-  chokidar.watch.mockReturnValue(mockChokidarWatcher)
-  loadRollup.mockResolvedValue(config)
-
-  const rollupConfigStream = createRollupConfigStream({ configFile })
-
-  const sinkMock = callbagMock()
-  rollupConfigStream(0, sinkMock)
-
-  mockChokidarWatcher.emit('ready')
-  await flushPromises()
-
-  expect(sinkMock.getReceivedData()).toEqual([config])
-
-  // Terminate the source and sink.
-  sinkMock.emit(2)
-})
-
-test('createRollupConfigStream returns a stream of configs that emits when the file is updated', async () => {
-  const mockChokidarWatcher = new EventEmitter()
-  const config = { options: 'dummyOptions' }
-  const configFile = 'dummyFile'
-
-  chokidar.watch.mockReturnValue(mockChokidarWatcher)
-  loadRollup.mockResolvedValue(config)
-
-  const rollupConfigStream = createRollupConfigStream({ configFile })
-
-  const sinkMock = callbagMock()
-  rollupConfigStream(0, sinkMock)
-
-  mockChokidarWatcher.emit('change')
-  await flushPromises()
-
-  expect(sinkMock.getReceivedData()).toEqual([config])
-
-  // Terminate source and sink
-  sinkMock.emit(2)
-})
-
-test('configStream can be debounced', async () => {
-  const mockChokidarWatcher = new EventEmitter()
-  const config = { options: 'dummyOptions' }
-  const configFile = 'dummyFile'
-
-  chokidar.watch.mockReturnValue(mockChokidarWatcher)
-  loadRollup.mockResolvedValue(config)
-
-  const rollupConfigStream = createRollupConfigStream({ configFile, debounceWait: 1000 })
-
-  const sinkMock = callbagMock()
-
-  rollupConfigStream(0, sinkMock)
-
-  mockChokidarWatcher.emit('change')
-  mockChokidarWatcher.emit('change')
-  mockChokidarWatcher.emit('change')
-  await flushPromises()
-
-  expect(sinkMock.getReceivedData()).toEqual([])
-
-  jest.advanceTimersByTime(1000)
-  await flushPromises()
-
-  expect(sinkMock.getReceivedData()).toEqual([config])
+  rollup.watch.mockReset()
+  fileWatcherStream.create.mockReset()
 })
 
 class MockRollupWatcher extends EventEmitter {
-  constructor () {
+  constructor (name = undefined) {
     super()
+    this.name = name
     this.close = jest.fn()
   }
 }
 
-test('createRollupEventStream emits events from rollup watcher', async () => {
-  const configStreamMock = callbagMock(true)
-  const configStreamDummyValue = { options: 'dummyOptions', warnings: 'dummyWarnings' }
-  const mockRollupWatcher = new MockRollupWatcher()
+describe('createRollupEventStream creates a stream that', async () => {
+  test('emits INIT event on file load', async () => {
+    const fileUpdateStreamMock = callbagMock(true)
 
-  rollup.watch.mockReturnValue(mockRollupWatcher)
+    fileWatcherStream.create.mockReturnValue(fileUpdateStreamMock)
+    loadRollup.mockResolvedValue({ options: {}, warnings: {} })
 
-  const rollupEventStream = createRollupEventStream(configStreamMock)
+    const configFile = 'dummyFile'
 
-  const sinkMock = callbagMock()
+    const rollupEventStream = createRollupEventStream({ configFile })
 
-  rollupEventStream(0, sinkMock)
+    const sinkMock = callbagMock()
 
-  configStreamMock.emit(1, configStreamDummyValue)
-  expect(rollup.watch).toBeCalledWith(configStreamDummyValue.options)
+    rollupEventStream(0, sinkMock)
 
-  mockRollupWatcher.emit('event', { code: 'dummyEvent' })
-  expect(sinkMock.getReceivedData()).toEqual([
-    {
-      code: 'dummyEvent',
-      source: mockRollupWatcher
+    fileUpdateStreamMock.emit(1, configFile)
+
+    await flushPromises()
+
+    expect(sinkMock.getReceivedData()).toEqual([{ code: 'INIT' }])
+  })
+
+  test('emits ERROR when config fails to load', async () => {
+    const fileUpdateStreamMock = callbagMock(true)
+
+    const error = new Error('Dummy Error')
+
+    fileWatcherStream.create.mockReturnValue(fileUpdateStreamMock)
+    loadRollup.mockRejectedValue(error)
+
+    const configFile = 'dummyFile'
+
+    const rollupEventStream = createRollupEventStream({ configFile })
+
+    const sinkMock = callbagMock()
+
+    rollupEventStream(0, sinkMock)
+
+    fileUpdateStreamMock.emit(1, configFile)
+
+    await flushPromises()
+
+    expect(sinkMock.getReceivedData()).toEqual([{ code: 'INIT' }, { code: 'ERROR', error }])
+  })
+
+  test('emits ERROR when watcher fails to be created', async () => {
+    const fileUpdateStreamMock = callbagMock(true)
+
+    const error = new Error('Dummy Error')
+    const warnings = {}
+    const config = { options: {}, warnings }
+
+    fileWatcherStream.create.mockReturnValue(fileUpdateStreamMock)
+    loadRollup.mockResolvedValue(config)
+    rollup.watch.mockImplementation(() => {
+      throw error
+    })
+
+    const configFile = 'dummyFile'
+
+    const rollupEventStream = createRollupEventStream({ configFile })
+
+    const sinkMock = callbagMock()
+
+    rollupEventStream(0, sinkMock)
+
+    fileUpdateStreamMock.emit(1, configFile)
+
+    await flushPromises()
+
+    expect(sinkMock.getReceivedData()).toEqual([{ code: 'INIT' }, { code: 'ERROR', error, source: { warnings } }])
+  })
+
+  test('emits event when watcher emits', async () => {
+    const fileUpdateStreamMock = callbagMock(true)
+
+    const warnings = {}
+    const config = { options: {}, warnings }
+    const mockWatcher = new MockRollupWatcher()
+
+    fileWatcherStream.create.mockReturnValue(fileUpdateStreamMock)
+    loadRollup.mockResolvedValue(config)
+    rollup.watch.mockReturnValue(mockWatcher)
+
+    const configFile = 'dummyFile'
+
+    const rollupEventStream = createRollupEventStream({ configFile })
+
+    const sinkMock = callbagMock()
+
+    rollupEventStream(0, sinkMock)
+
+    fileUpdateStreamMock.emit(1, configFile)
+    await flushPromises()
+
+    const event = { code: 'START' }
+    mockWatcher.emit('event', event)
+
+    expect(sinkMock.getReceivedData()).toEqual([{ code: 'INIT' }, { code: 'START', source: mockWatcher }])
+  })
+
+  test('normalizes events over multiple watchers', async () => {
+    const configFile = 'dummyFile'
+    const mockFileUpdateStream = callbagMock(true)
+
+    fileWatcherStream.create.mockReturnValueOnce(mockFileUpdateStream)
+
+    const reloads = [
+      // Reload 1
+      {
+        config: { options: 'options 1', warnings: 'warnings 1' },
+        mockWatcher: new MockRollupWatcher('watcher 1')
+      },
+      // Reload 2
+      {
+        config: { options: 'options 2', warnings: 'warnings 2' },
+        mockWatcher: new MockRollupWatcher('watcher 2')
+      }
+    ]
+
+    const executeReload = async ({ config, mockWatcher }, event) => {
+      rollup.watch.mockReturnValueOnce(mockWatcher)
+      loadRollup.mockResolvedValueOnce(config)
+
+      mockFileUpdateStream.emit(1, configFile)
+
+      await flushPromises()
+
+      mockWatcher.emit('event', { code: 'START' })
     }
-  ])
-})
 
-test('createRollupEventStream normalizes events over multiple watchers', async () => {
-  const configStreamMock = callbagMock(true)
-  const configStreamDummyValue = { options: 'dummyOptions', warnings: 'dummyWarnings' }
-  const mockRollupWatcher = new MockRollupWatcher()
+    const rollupEventStream = createRollupEventStream({ configFile })
 
-  rollup.watch.mockReturnValue(mockRollupWatcher)
+    const sinkMock = callbagMock()
 
-  const rollupEventStream = createRollupEventStream(configStreamMock)
+    rollupEventStream(0, sinkMock)
 
-  const sinkMock = callbagMock()
-  rollupEventStream(0, sinkMock)
+    await executeReload(reloads[0], { code: 'START' })
+    await executeReload(reloads[1], { code: 'START' })
 
-  const emulateConfigEmit = (config, code) => {
-    configStreamMock.emit(1, config)
-    mockRollupWatcher.emit('event', { code })
-  }
-
-  emulateConfigEmit(configStreamDummyValue, 'dummyEvent1')
-
-  expect(sinkMock.getReceivedData()).toEqual([
-    {
-      code: 'dummyEvent1',
-      source: mockRollupWatcher
-    }
-  ])
-
-  emulateConfigEmit(configStreamDummyValue, 'dummyEvent2')
-
-  expect(sinkMock.getReceivedData()).toEqual([
-    {
-      code: 'dummyEvent1',
-      source: mockRollupWatcher
-    },
-    {
-      code: 'dummyEvent2',
-      source: mockRollupWatcher
-    }
-  ])
+    expect(sinkMock.getReceivedData()).toEqual([
+      { code: 'INIT' },
+      { code: 'START', source: reloads[0].mockWatcher },
+      { code: 'INIT' },
+      { code: 'START', source: reloads[1].mockWatcher }
+    ])
+  })
 })
