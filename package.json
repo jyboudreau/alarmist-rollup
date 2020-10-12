@@ -10,10 +10,11 @@
     "test": "jest",
     "format": "prettier-standard --format",
     "lint": "standard | snazzy",
-    "alarmist:test": "",
-    "alarmist:format": "",
-    "alarmist:lint": "",
-    "start": "",
+    "verify": "npm-run-all -s test format lint",
+    "alarmist:test": "nodemon -V --delay 2 --watch . -e js --exec \"alarmist-npm test\"",
+    "alarmist:format": "nodemon -V --delay 2 --watch . -e js,md,json,yaml,yml --exec \"alarmist-npm format\"",
+    "alarmist:lint": "nodemon -V --delay 2 --watch . -e js --exec \"alarmist-npm lint\"",
+    "start": "alarmist-monitor npm-run-all -p \"alarmist:*\"",
     "ci": "npm-run-all -s test format lint"
   },
   "husky": {
@@ -27,11 +28,11 @@
   "devDependencies": {
     "alarmist": "^1.0.27",
     "alarmist-npm": "^1.0.6",
-    "chokidar": "^3.4.1",
     "husky": "^4.2.5",
     "jest": "^26.0.1",
     "jest-mock-console": "^1.0.0",
     "lint-staged": "^10.2.6",
+    "nodemon": "^2.0.4",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.0.5",
     "prettier-standard": "^16.3.0",

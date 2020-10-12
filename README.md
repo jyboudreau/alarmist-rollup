@@ -2,6 +2,9 @@
 
 Wrap rollup watch in alarmist jobs
 
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+[![code format: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat)](https://github.com/prettier/prettier)
+
 ## Usage
 
 As this is a tool linking `rollup` with `alarmist`, it is expected that your project already has both [`alarmist`](https://www.npmjs.com/package/alarmist) and [`rollup`](https://www.npmjs.com/package/rollup) installed.
@@ -75,10 +78,12 @@ Test the example configuration with these steps:
 
 ## Contributing
 
-Run lint, tests, build, etc before pushing/submitting PRs
+Run lint, format and tests etc before pushing/submitting PRs
 
-- `npm test` - lint and test
-- `npm run build` - run tests then build
-- `npm run watch` - watch for changes and run build
-- `npm run ci` - run build and submit coverage to coveralls
-- `npm start` - watch for changes and build, lint, test, etc in parallel with alarmist
+- `yarn test` - Run tests for the project.
+- `yarn format` - Enforce prettier formatting.
+- `yarn lint` - Lint the project with standardjs rules.
+- `yarn verify` - Test, format and lint all in one.
+- `yarn start` - Watch for changes lint, test, etc in parallel with alarmist.
+- `yarn ci` - Run `verify` and submit coverage to coveralls.
+- `yarn example:monitor` - Run the example project's monitor with alarmist and alarmist-rollup.
