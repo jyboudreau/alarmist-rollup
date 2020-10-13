@@ -8,19 +8,26 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
     strategy:
       matrix:
-        node-version: [10.x, 12.x, 14.x]
-
+        os:
+          - ubuntu-latest
+          - windows-latest
+        node-version:
+          - 12.x
+          - 14.x
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - run: yarn install
-      - run: yarn format
-      - run: yarn lint
-      - run: yarn test
+      - name: Install Dependencies
+        run: yarn install
+      - name: Check formatting
+        run: yarn format --check
+      - name: Linting
+        run: yarn lint
+      - name: Unit tests
+        run: yarn test
