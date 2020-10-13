@@ -65,7 +65,7 @@ Options:
 
 ## Example configuration
 
-See the example project in [./packages/alarmist-rollup-example] for a working configuration.
+See the example project in [packages/alarmist-rollup-example](packages/alarmist-rollup-example/) for a working configuration.
 
 Test the example configuration with these steps:
 
